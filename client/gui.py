@@ -24,7 +24,7 @@ class GUI:
 
     def update(self, time_data):
         """
-        :param time_data: (time_data is recieved the same as in timedata.example.json)
+        :param dict time_data: (time_data is received as a dict the same as in timedata.example.json)
         :return:
         """
         pass
