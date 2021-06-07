@@ -37,10 +37,13 @@ class Manager:
                     self.gui.update(time_data)
                 else:
                     for key, value in time_data.items():
-                        values = value['values'][0]
-                        print("%s => (open: %s, close: %s, datetime: %s)" % (key, values['open'],
-                                                                             values['close'],
-                                                                             values['datetime']))
+                        if 'code' in value:
+                            print("error => ", value['message'])
+                        else:
+                            values = value['values'][0]
+                            print("%s => (open: %s, close: %s, datetime: %s)" % (key, values['open'],
+                                                                                 values['close'],
+                                                                                 values['datetime']))
                     print("---------------------- ******** ----------------------")
             except Exception as e:
                 print("error => " + str(e))
