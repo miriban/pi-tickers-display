@@ -19,3 +19,20 @@ certain position.
 
 ---
 
+### Starting Client on Rasperry PI
+
+- Run `pip install -r requirements.txt` to install
+required python libs.
+
+- Create an account at http://twelvedata.com and get
+your api key.
+
+- Create a file named `apis.tmp` and insert the 
+following
+```json
+{
+    "twelveDataApiKey": "YOUR_TWELVE_DATA_API_KEY"
+}
+```
+
+- Run `python3 app.py`

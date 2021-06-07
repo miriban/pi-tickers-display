@@ -1,0 +1,54 @@
+{
+  "GOOG": {
+    "meta": {
+      "symbol": "GOOG",
+      "interval": "1min",
+      "currency": "USD",
+      "exchange_timezone": "America/New_York",
+      "exchange": "NASDAQ",
+      "type": "Common Stock"
+    },
+    "values": [
+      {
+        "datetime": "2021-06-07 09:40:00",
+        "open": "2448.96997",
+        "high": "2448.96997",
+        "low": "2448.77002",
+        "close": "2448.77002",
+        "volume": "0"
+      }
+    ],
+    "status": "ok"
+  },
+  "AMZN": {
+    "meta": {
+      "symbol": "AMZN",
+      "interval": "1min",
+      "currency": "USD",
+      "exchange_timezone": "America/New_York",
+      "exchange": "NASDAQ",
+      "type": "Common Stock"
+    },
+    "values": [
+      {
+        "datetime": "2021-06-07 09:40:00",
+        "open": "3198.62012",
+        "high": "3198.81006",
+        "low": "3195.00000",
+        "close": "3195.01001",
+        "volume": "0"
+      }
+    ],
+    "status": "ok"
+  },
+  "UNKNOWN": {
+    "code": 400,
+    "message": "**symbol** not found: UNKNOWN. Please specify it correctly according to API Documentation.",
+    "status": "error",
+    "meta": {
+      "symbol": "GOOG,AMZN,BTC,UNKNOWN",
+      "interval": "1min",
+      "exchange": ""
+    }
+  }
+}
