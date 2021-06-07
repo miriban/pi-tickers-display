@@ -1,43 +1,50 @@
+const functions = require('firebase-functions');
 const firebase = require('firebase-admin');
 
 const firebaseApp = firebase.initializeApp();
 const usersRef = firebaseApp.database().ref('users');
 
 const addEtfs = (chatId, etfs) => {
-    usersRef.orderByKey().startAt(chatId).once('value', (snapshot) => {
+    usersRef.orderByChild('id').equalTo(chatId).once('value', (snapshot) => {
         if (snapshot.numChildren() > 0) {
             const key = Object.keys(snapshot.val())[0];
-            let currentEtfs = snapshot.val()[key].etfs || [];
-            currentEtfs = currentEtfs.filter((etf) => etfs.findIndex((e) => e === etf) === -1);
-            usersRef.child(key).update({
-                etfs: etfs.concat(currentEtfs),
-            })
+            if (key.indexOf(chatId) !== -1) {
+                let currentEtfs = snapshot.val()[key].etfs || [];
+                currentEtfs = currentEtfs.filter((etf) => etfs.findIndex((e) => e === etf) === -1);
+                usersRef.child(key).update({
+                    etfs: etfs.concat(currentEtfs),
+                });
+            }
         }
     });
 }
 
 const removeEtfs = (chatId, etfs) => {
-    usersRef.orderByKey().startAt(chatId).once('value', (snapshot) => {
+    usersRef.orderByChild('id').equalTo(chatId).once('value', (snapshot) => {
         if (snapshot.numChildren() > 0) {
             const key = Object.keys(snapshot.val())[0];
-            const currentEtfs = snapshot.val()[key].etfs|| [];
-            usersRef.child(key).update({
-                etfs: currentEtfs.filter((etf) => etfs.findIndex((e) => e === etf) === -1),
-            })
+            if (key.indexOf(chatId) !== -1) {
+                const currentEtfs = snapshot.val()[key].etfs || [];
+                usersRef.child(key).update({
+                    etfs: currentEtfs.filter((etf) => etfs.findIndex((e) => e === etf) === -1),
+                })
+            }
         }
     });
 }
 
 const moveEtf = (chatId, etf, position) => {
-    usersRef.orderByKey().startAt(chatId).once('value', (snapshot) => {
+    usersRef.orderByChild('id').equalTo(chatId).once('value', (snapshot) => {
         if (snapshot.numChildren() > 0) {
             const key = Object.keys(snapshot.val())[0];
-            let currentEtfs = snapshot.val()[key].etfs|| [];
-            const currentEtfIndex = currentEtfs.findIndex((e) => e === etf);
-            currentEtfs = moveElementInArray(currentEtfs,currentEtfIndex, position);
-            usersRef.child(key).update({
-                etfs: currentEtfs,
-            })
+            if (key.indexOf(chatId) !== -1) {
+                let currentEtfs = snapshot.val()[key].etfs || [];
+                const currentEtfIndex = currentEtfs.findIndex((e) => e === etf);
+                currentEtfs = moveElementInArray(currentEtfs, currentEtfIndex, position);
+                usersRef.child(key).update({
+                    etfs: currentEtfs,
+                })
+            }
         }
     });
 }
@@ -64,16 +71,21 @@ const getEtfsFromMessage = (message) => {
  * Handling commands comming from telegram
  * @param bot
  */
-
 exports.handleCommands = (bot) => {
     // command to start the configurations
     bot.command('/start', (ctx) => {
-        const chatId = ctx.message.chat.id.toString();
+        const chatId = ctx.chat.id.toString();
         const token = Math.floor(1000 + Math.random() * 9000).toString();
-        usersRef.orderByKey().startAt(chatId).once('value', (snapshot) => {
+        usersRef.orderByChild('id').equalTo(chatId).once('value', (snapshot) => {
             let key = chatId + '-' + token;
             if (snapshot.numChildren() > 0) {
-                key = Object.keys(snapshot.val())[0];
+                let first_doc_key = Object.keys(snapshot.val())[0];
+                if (first_doc_key.indexOf(chatId) !== -1)
+                    key = first_doc_key;
+                else
+                    usersRef.child(key).set({
+                        id: chatId,
+                    });
             } else {
                 usersRef.child(key).set({
                     id: chatId,
@@ -85,7 +97,7 @@ exports.handleCommands = (bot) => {
 
     // add a certain etf
     bot.command('/add', (ctx) => {
-        const chatId = ctx.message.chat.id.toString();
+        const chatId = ctx.chat.id.toString();
         const message = ctx.message.text.trim();
         try {
             const etfs = getEtfsFromMessage(message);
@@ -99,7 +111,7 @@ exports.handleCommands = (bot) => {
 
     // remove a certain etf
     bot.command('/remove', (ctx) => {
-        const chatId = ctx.message.chat.id.toString();
+        const chatId = ctx.chat.id.toString();
         const message = ctx.message.text.trim();
 
         try {
@@ -114,7 +126,7 @@ exports.handleCommands = (bot) => {
 
     // move command
     bot.command('/move', (ctx) => {
-        const chatId = ctx.message.chat.id.toString();
+        const chatId = ctx.chat.id.toString();
         const message = ctx.message.text.trim();
 
         try {
