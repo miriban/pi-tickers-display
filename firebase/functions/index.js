@@ -16,5 +16,6 @@ exports.echoBot = functions.https.onRequest(async (request, response) => {
     return await bot.handleUpdate(request.body, response).then((rv) => {
         // if it's not a request from the telegram, rv will be undefined, but we should respond with 200
         // eslint-disable-next-line promise/always-return
+        return true;
     })
 })

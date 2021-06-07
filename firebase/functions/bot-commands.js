@@ -56,7 +56,7 @@ const moveElementInArray = (arr, old_index, new_index) => {
 const getEtfsFromMessage = (message) => {
     const etfsText = message.split(new RegExp("add|remove|move"))[1].trim();
     if (etfsText === "")
-        throw "No etfs provided!";
+        throw Error("No etfs provided!");
     return etfsText.split(" ").map((etf) => etf.toUpperCase());
 }
 
