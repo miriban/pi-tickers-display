@@ -4,6 +4,7 @@ import time
 
 from client.firebase_rest_client import Firebase
 from client.twelve_data_client import TwelveDataClient
+from client.yahoo_client import YahooClient
 from client.gui import GUI
 
 
@@ -13,6 +14,7 @@ class Manager:
     def __init__(self):
         self.user_id = ''
         self.twelve_data_client = TwelveDataClient()
+        self.yahoo_client = YahooClient()
         self.gui = GUI(get_timedata_callback=self.get_time_Date)
 
     def start(self):
@@ -35,7 +37,8 @@ class Manager:
             while 1:
                 try:
                     etfs = Firebase.get_user_etfs(self.user_id)
-                    time_data = self.twelve_data_client.get_time_series(etfs)
+                    # time_data = self.twelve_data_client.get_time_series(etfs)
+                    time_data = self.yahoo_client.get_time_series(etfs)
                     for key, value in time_data.items():
                         if 'code' in value:
                             print("error => ", value['message'])
@@ -51,7 +54,9 @@ class Manager:
 
     def get_time_Date(self):
         etfs = Firebase.get_user_etfs(self.user_id)
-        return self.twelve_data_client.get_time_series(etfs)
+        self._update_etfs(etfs)
+        # self.twelve_data_client.get_time_series(etfs)
+        return self.yahoo_client.get_time_series(etfs)
 
     def _ask_user_for_code(self):
         if not os.path.exists(Manager.TMP_USER_FILENAME):
@@ -78,3 +83,11 @@ class Manager:
         with open(Manager.TMP_USER_FILENAME, 'w') as tmp_file:
             user.update({'code': self.user_id})
             json.dump(user, tmp_file)
+
+    def _update_etfs(self, etfs):
+        with open(Manager.TMP_USER_FILENAME, 'r') as tmp_file:
+            data = json.load(tmp_file)
+
+        with open(Manager.TMP_USER_FILENAME, 'w') as tmp_file:
+            data['etfs'] = etfs
+            json.dump(data, tmp_file)

@@ -172,19 +172,17 @@ class EtfsScreen(BoxLayout, Screen):
         self.get_timedata = get_timedata_callback
         update_time_event = Clock.schedule_interval(self.update_time, 0.5)
         self.bind(x=update_time_event, y=update_time_event)
-        update_etfs_event = Clock.schedule_interval(self.update_etfs, 10)
+        update_etfs_event = Clock.schedule_interval(self.update_etfs, 5)
         self.bind(x=update_etfs_event, y=update_etfs_event)
 
     def update_etfs(self, *kwargs):
         data_to_show = []
         etfs_time_data = self.get_timedata()
-        print("self.etfs_time_data => ", etfs_time_data)
         for key, value in etfs_time_data.items():
             if 'code' in value:
                 print("error => ", value['message'])
             else:
                 symbol = value['meta']['symbol']
-                print("value['meta'] => ", value['meta'])
                 try:
                     if 'currency_base' in value['meta']:
                         currency = ''
