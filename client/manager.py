@@ -13,7 +13,7 @@ class Manager:
     def __init__(self):
         self.user_id = ''
         self.twelve_data_client = TwelveDataClient()
-        self.gui = GUI()
+        self.gui = GUI(get_timedata_callback=self.get_time_Date)
 
     def start(self):
         user = self._get_user()
@@ -29,13 +29,13 @@ class Manager:
         print("Etfs detected => " + ','.join(user['etfs']))
 
     def watch(self, with_gui=True):
-        while 1:
-            try:
-                etfs = Firebase.get_user_etfs(self.user_id)
-                time_data = self.twelve_data_client.get_time_series(etfs)
-                if with_gui:
-                    self.gui.update(time_data)
-                else:
+        if with_gui:
+            self.gui.run()
+        else:
+            while 1:
+                try:
+                    etfs = Firebase.get_user_etfs(self.user_id)
+                    time_data = self.twelve_data_client.get_time_series(etfs)
                     for key, value in time_data.items():
                         if 'code' in value:
                             print("error => ", value['message'])
@@ -45,9 +45,13 @@ class Manager:
                                                                                  values['close'],
                                                                                  values['datetime']))
                     print("---------------------- ******** ----------------------")
-            except Exception as e:
-                print("error => " + str(e))
-            time.sleep(10)
+                except Exception as e:
+                    print("error => " + str(e))
+                time.sleep(10)
+
+    def get_time_Date(self):
+        etfs = Firebase.get_user_etfs(self.user_id)
+        return self.twelve_data_client.get_time_series(etfs)
 
     def _ask_user_for_code(self):
         if not os.path.exists(Manager.TMP_USER_FILENAME):
