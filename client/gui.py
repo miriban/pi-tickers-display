@@ -193,6 +193,12 @@ class EtfsScreen(BoxLayout, Screen):
                 values = value['values'][0]
                 open_value = '%.2f' % float(values['open'])
                 data_to_show.append({'name': symbol, 'value': open_value+currency})
+
+        # prevent duplicate
+        if len(data_to_show) < 5:
+            for i in range(len(data_to_show) - 1, 5):
+                data_to_show.append({'name': '', 'value': ''})
+
         # draw on screen
         for index, etf in enumerate(data_to_show[:5]):
             self.ids["Label_%s" % (index + 1,)].text = etf['name']
